@@ -1,0 +1,5 @@
+<RCC>
+<qresource>
+    <file alias="gear">fa/solid/gear.svg</file>
+</qresource>
+</RCC>
