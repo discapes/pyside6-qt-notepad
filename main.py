@@ -14,6 +14,19 @@ def parse(app):
 if __name__ == "__main__":
     app.setStyle("Fusion")
 
+    app.setStyleSheet("""
+                    QMainWindow, QDialog {
+                        /*background-color: darkgray;*/
+                        border: 1px solid black;
+                    }
+                    QMenuBar {
+                        border: 0px;
+                    }
+                    QPlainTextEdit {
+                        border: 0;
+                        border-top: 1px solid black;
+                    }
+                      """)
     app.setApplicationName("My Application")
     app.setApplicationVersion("1.0")
     parse(app)

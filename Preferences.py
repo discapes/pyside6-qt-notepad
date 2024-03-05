@@ -27,3 +27,4 @@ class Preferences(QDialog):
         
         layout.addWidget(self.line)
         layout.addLayout(self.bbar)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
