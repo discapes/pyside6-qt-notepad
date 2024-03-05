@@ -35,8 +35,9 @@ class MainWidget(QWidget):
         self.icons = IconWidget()
         self.editor = QPlainTextEdit()
         self.prefs = Preferences(self)
+        self.header = self.setup_header()
         
-        self.layout().addWidget(self.setup_header())
+        self.layout().addWidget(self.header)
         self.layout().addWidget(self.editor)
         
     @Slot()
@@ -47,7 +48,7 @@ class MainWidget(QWidget):
                 with open(file_name) as file:
                     self.file_name = file_name
                     self.editor.setPlainText(file.read())
-                    self.statusMessage.setText(self.file_name)
+                    self.header.statusMessage.setText(self.file_name)
         except Exception as e:
             msg_box = QMessageBox()
             msg_box.setText(str(e))
@@ -60,7 +61,7 @@ class MainWidget(QWidget):
             if len(file_name):
                 with open(file_name, "x") as file:
                     self.file_name = file_name
-                    self.statusMessage.setText(self.file_name)
+                    self.header.statusMessage.setText(self.file_name)
                     self.editor.setPlainText("")
         except Exception as e:
             msg_box = QMessageBox()

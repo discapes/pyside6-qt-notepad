@@ -2,6 +2,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import QEvent, QObject, Qt, Slot
 from PySide6.QtGui import QAction, QCloseEvent, QIcon, QPixmap  
 from PySide6 import QtCore, QtGui
+from app import app
 
 
 class IconWidget(QScrollArea):

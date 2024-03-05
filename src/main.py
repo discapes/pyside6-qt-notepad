@@ -25,7 +25,14 @@ if __name__ == "__main__":
                     }
                     QPlainTextEdit {
                         border: 0;
-                        border-top: 1px solid black;
+                    }
+                    /*QWidget {
+                        margin: 0;
+                        padding: 0;
+                        spacing: 0;                        
+                    }*/
+                    QPushButton {
+                        padding: 3px 5px;
                     }
                       """)
     app.setApplicationName("My Application")

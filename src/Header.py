@@ -6,19 +6,22 @@ from PySide6 import QtCore, QtGui
 from MenuBar import MenuBar
 
 
-class Header(QWidget):
-    def __init__(self):
+class Header(QFrame): # Must be QFrame
+    def __init__(self, menubar = True):
         super().__init__()
-        
+        self.setStyleSheet("Header { border-style: solid; border-bottom-width: 1px; }")
+                
         self.setLayout(QHBoxLayout())
         self.layout().setSpacing(5)
         self.layout().setContentsMargins(0,0,0,0)
         
         self.statusMessage = QLabel("Untitled")
         self.statusMessage.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.menubar = MenuBar()
         
-        self.layout().addWidget(self.menubar)
+        if menubar:
+            self.menubar = MenuBar()
+            self.layout().addWidget(self.menubar)
+            
         self.layout().addWidget(self.statusMessage)
         self.layout().addWidget(self.createCSD())
         
