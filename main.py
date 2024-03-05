@@ -13,6 +13,7 @@ def parse(app):
 
 if __name__ == "__main__":
     app.setStyle("Fusion")
+
     app.setApplicationName("My Application")
     app.setApplicationVersion("1.0")
     parse(app)

@@ -5,17 +5,17 @@ title = pyside_app_demo
 # of input_file
 project_dir = .
 # source file path
-input_file = /home/miika/code/github/qtest/main.py
+input_file = /app/main.py
 # directory where exec is stored
 exec_directory = .
 # path to .pyproject project file
 project_file = 
 # application icon
-icon = /home/miika/.local/share/virtualenvs/qtest-XL92pSa8/lib64/python3.11/site-packages/PySide6/scripts/deploy_lib/pyside_icon.jpg
+icon = /app/icon.jpg
 
 [python]
 # python path
-python_path = /home/miika/.local/share/virtualenvs/qtest-XL92pSa8/bin/python
+python_path = /root/.local/share/virtualenvs/app-4PlAip0Q/bin/python
 # python packages to install
 # ordered-set = increase compile time performance of nuitka packaging
 # zstandard = provides final executable size optimization

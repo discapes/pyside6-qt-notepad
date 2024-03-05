@@ -4,6 +4,7 @@ import random
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QAction, QIcon, QPixmap
+from Preferences import Preferences
 from app import app
 import rc_icons
 
@@ -37,77 +38,121 @@ class MainWindow(QMainWindow):
     def file_menu(self):
         file_menu = self.menuBar().addMenu("&File")
         file_menu.setToolTipsVisible(True)
+        
         new_action = QAction("&New", self)
-        new_action.setStatusTip("Open new file")
-        new_action.setToolTip("Open new file")
-        new_action.triggered.connect(self.magic)
+        new_action.triggered.connect(self.new_file)
+        open_action = QAction("&Open", self)
+        open_action.triggered.connect(self.open_file)
+        save_action = QAction("&Save", self)
+        save_action.triggered.connect(self.save_file)
+       
+       
         icon_action = QAction("&Icons", self)
         icon_action.triggered.connect(self.open_icons)
         icon_action.setStatusTip("Open icon list")
-        file_menu.addActions([icon_action, new_action])
+        
+        file_menu.addActions([icon_action, new_action, open_action, save_action])
+        
+    def edit_menu(self):
+        edit = self.menuBar().addMenu("&Edit")
+        undo = QAction("&Undo", self)
+        self.editor.undoAvailable.connect(print)
+        def undo_fn():
+            print("Undo")
+            self.editor.undo()
+        undo.triggered.connect(undo_fn)
+        redo = QAction("&Redo", self)
+        undo.triggered.connect(self.editor.redo)
+        preferences = QAction(QIcon(":gear"),"&Preferences", self)
+        preferences.triggered.connect(self.open_pref)
+        edit.addActions([undo, redo, preferences])
         
     def view_menu(self):
-        view_menu = self.menuBar().addMenu("&Edit")
+        view = self.menuBar().addMenu("&View")
         undo = QAction("&Undo", self)
         redo = QAction("&Redo", self)
-        view_menu.addActions([undo, redo])
+        view.addActions([undo, redo])
+
+    def help_menu(self):
+        help = self.menuBar().addMenu("&Help")
+        undo = QAction("&Undo", self)
+        redo = QAction("&Redo", self)
+        help.addActions([undo, redo])
+
+    def setup_menubar(self):
+        pref_action = QAction(self)
+        pref_action.setIcon(QIcon(":gear"))
+        pref_action.triggered.connect(self.open_pref)
+        self.menuBar().addAction(pref_action)
         
+        self.file_menu()
+        self.edit_menu()
+        self.view_menu()
+        self.help_menu()
+
 
     def __init__(self):
         super().__init__()
         widget = QWidget()
         layout = QVBoxLayout()
         widget.setLayout(layout)
-        self.statusBar()
-
-        self.hello = ["Hello World", "Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
-        self.i = 0
         
-        pref_action = QAction(self)
-        pref_action.setIcon(QIcon(":gear"))
-        self.menuBar().addAction(pref_action)
+        self.icons = IconWidget()
+        self.editor = QPlainTextEdit()
+        self.prefs = Preferences(self)
+        self.statusMessage = QLabel()
         
-        self.file_menu()
-        self.view_menu()
-
-        self.button = QPushButton("Click me!")
-        self.button2 = QPushButton("Click meeee!")
-        self.button2.clicked.connect(self.open_file)
-        self.text = QLabel(self.hello[self.i],
-                                     alignment=Qt.AlignCenter)
-        
-        self.bbar = QHBoxLayout()
-        self.bbar.addWidget(self.button)
-        self.bbar.addWidget(self.button2)
-        self.line = QLineEdit()
-        self.line.setPlaceholderText("asd")
-        self.bbar.addWidget(self.line)
-        self.bbar.setSpacing(50)
-        self.bbar.setAlignment(Qt.AlignmentFlag.AlignJustify | Qt.AlignmentFlag.AlignVCenter)
+        self.setup_menubar()
 
 
-        self.setWindowTitle("Window title")
-        self.setWindowIcon(QIcon())
-        layout.addWidget(self.text)
-        layout.addLayout(self.bbar)
+        self.setWindowTitle("Editor")
+        app.setWindowIcon(QIcon(":pen"))
+        layout.addWidget(self.editor)
         self.setCentralWidget(widget)
-        self.l = layout
-        #self.setWindowState(Qt.WindowState.WindowFullScreen)
-        #self.setWindowState(Qt.WindowState.WindowMaximized)
-        self.icons = getattr(self, "icons", IconWidget())
-        self.l.addWidget(self.icons)
+        
+        self.statusBar().addWidget(self.statusMessage)
+        
         self.icons.setVisible(False)
 
-        self.button.clicked.connect(self.magic)
-
-    @Slot()
-    def magic(self):
-        self.i = (self.i + 1) % len(self.hello)
-        self.text.setText(self.hello[self.i])
 
     @Slot()
     def open_file(self):
-        file = QFileDialog.getOpenFileName(self, "Open file")
+        try:
+            file_name, _ = QFileDialog.getOpenFileName(self, "Open file")
+            if len(file_name):
+                with open(file_name) as file:
+                    self.file_name = file_name
+                    self.editor.setPlainText(file.read())
+                    self.statusMessage.setText(self.file_name)
+        except Exception as e:
+            msg_box = QMessageBox()
+            msg_box.setText(str(e))
+            msg_box.exec()
+
+    @Slot()
+    def new_file(self):
+        try:
+            file_name, _ = QFileDialog.getSaveFileName(self, "Open file")
+            if len(file_name):
+                with open(file_name, "x") as file:
+                    self.file_name = file_name
+                    self.statusMessage.setText(self.file_name)
+                    self.editor.setPlainText("")
+        except Exception as e:
+            msg_box = QMessageBox()
+            msg_box.setText(str(e))
+            msg_box.exec()
+        
+    @Slot()
+    def save_file(self):
+        try:
+            with open(self.file_name, "w") as file:
+                file.write(self.editor.toPlainText())
+        except Exception as e:
+            msg_box = QMessageBox()
+            msg_box.setText(str(e))
+            msg_box.exec()
+
 
     @Slot()
     def open_icons(self):
@@ -115,4 +160,5 @@ class MainWindow(QMainWindow):
         
     @Slot()
     def open_pref(self):
-        self.icons.setVisible(not self.icons.isVisible())
+        print("Opening")
+        self.prefs.exec()
