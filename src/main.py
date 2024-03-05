@@ -3,6 +3,7 @@ from MainWindow import MainWindow
 
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt, QCommandLineParser
+from PySide6.QtGui import QCloseEvent
 from app import app
 
 def parse(app):

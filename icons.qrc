@@ -2,5 +2,8 @@
 <qresource>
     <file alias="gear">fa/solid/gear.svg</file>
     <file alias="pen">fa/solid/pen-to-square.svg</file>
+    <file alias="minus">fa/solid/minus.svg</file>
+    <file alias="xmark">fa/solid/xmark.svg</file>
+    <file alias="square">fa/regular/square.svg</file>
 </qresource>
 </RCC>
