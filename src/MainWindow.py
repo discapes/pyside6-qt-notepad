@@ -26,29 +26,43 @@ class MainWindow(QMainWindow):
     
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         def onMouseEvent(watched: QObject, e: QtGui.QMouseEvent):
-            x = e.pos().x() / self.width()
-            y = e.pos().y() / self.height()
-            delta = 0.02
+            left = e.pos().x()
+            top = e.pos().y()
+            right = self.width() - left
+            bottom = self.height() - top
+            delta = 15
+            delta2 = delta * 2 # so corner is a bit bigger
+            
+            isTop = top < 30
+            isBL = bottom < delta2 and left < delta2 and not (bottom > delta and left > delta)
+            isBR = bottom < delta2 and right < delta2 and not (bottom > delta and right > delta)
+            isLeft = not isTop and not isBL and left < delta
+            isRight = not isTop and not isBR and right < delta
+            isBottom = not isBR and not isBL and bottom < delta
             
             if event.type() is QEvent.Type.MouseButtonPress:
-                edges = []
-                if x < delta and y > 0.1: edges.append(Qt.Edge.LeftEdge)
-                if x > 1 - delta and y > 0.1: edges.append(Qt.Edge.RightEdge)
-                if y > 1 - delta: edges.append(Qt.Edge.BottomEdge)
-                if len(edges):
-                    self.windowHandle().startSystemResize(reduce(lambda x, y: x | y, edges))
+                edge = False
+                if isBL: edge = Qt.Edge.BottomEdge | Qt.Edge.LeftEdge
+                elif isBR: edge = Qt.Edge.BottomEdge | Qt.Edge.RightEdge
+                elif isLeft: edge = Qt.Edge.LeftEdge
+                elif isRight: edge = Qt.Edge.RightEdge
+                elif isBottom: edge = Qt.Edge.BottomEdge
+                if edge:
+                    self.windowHandle().startSystemResize(edge)
                     
             if event.type() is QEvent.Type.MouseMove:
                 cursor = False
-                if x < delta and y > 1 - delta: cursor = Qt.CursorShape.SizeBDiagCursor
-                elif x > 1 - delta and y > 1 - delta: cursor = Qt.CursorShape.SizeFDiagCursor
-                elif (x < delta or x > 1 - delta) and y > 0.1: cursor = Qt.CursorShape.SizeHorCursor
-                elif y > 1 - delta:  cursor = Qt.CursorShape.SizeVerCursor
+                if isBL: cursor = Qt.CursorShape.SizeBDiagCursor
+                elif isBR: cursor = Qt.CursorShape.SizeFDiagCursor
+                elif isLeft or isRight: cursor = Qt.CursorShape.SizeHorCursor
+                elif isBottom:  cursor = Qt.CursorShape.SizeVerCursor
                 
                 if cursor: 
-                    app.setOverrideCursor(cursor)
+                    if app.overrideCursor():
+                        app.changeOverrideCursor(cursor)
+                    else:
+                        app.setOverrideCursor(cursor)
                 else: 
-                    app.restoreOverrideCursor() # needed twice for some reason
                     app.restoreOverrideCursor()
                 
         if isinstance(event, QtGui.QMouseEvent) and isinstance(watched, QtGui.QWindow):
